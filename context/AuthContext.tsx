@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import jwt_decode from "jwt-decode";
 import Cookies from "universal-cookie";
 import { User } from "../types/user";
+import { useStore } from "@/store/store";
 interface IAuthContextProps {
   user: User | null;
   isloggedIn: boolean;
@@ -23,19 +24,7 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isloggedIn, setIsLoggedIn] = useState<boolean>(false);
   const router = useRouter();
-  const loginUser = () => {
-    const cookie = new Cookies();
-    const token = cookie.get("token");
-
-    if (token != undefined) {
-      const decoded: User = jwt_decode(token);
-      setUser(decoded);
-      setIsLoggedIn(true);
-    } else {
-      setUser(null);
-      setIsLoggedIn(false);
-    }
-  };
+  const { loginUser } = useStore((store) => store.actions);
 
   useEffect(() => {
     loginUser();

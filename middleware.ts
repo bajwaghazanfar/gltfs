@@ -11,6 +11,19 @@ export function middleware(req: NextRequest) {
   const url = req.url;
 
   const token = cookies.get("token");
+  if (token?.value != null || token?.value != undefined) {
+    const decoded: User = jwt_decode(token?.value);
+
+    if (req.nextUrl.pathname === "/dashboard/admin") {
+      if (decoded.type != "admin") {
+        return NextResponse.redirect(
+          new URL("/dashboard?showErr=Unauthorised!", req.url)
+        );
+      } else {
+        return NextResponse.next();
+      }
+    }
+  }
 
   if (
     req.nextUrl.pathname.startsWith("/login") ||
@@ -22,7 +35,7 @@ export function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/", req.url));
     }
   }
-  console.log(req.nextUrl, token);
+
   if (req.nextUrl.pathname.startsWith("/dashboard")) {
     if (token === undefined) {
       return NextResponse.redirect(new URL("/login", req.url));
@@ -30,21 +43,20 @@ export function middleware(req: NextRequest) {
       return NextResponse.next();
     }
   }
-  //DECODING TOKEN HERE
+  // //DECODING TOKEN HERE
 
-  if (token?.value != null) {
-    const decoded: User = jwt_decode(token?.value);
-
-    if (req.nextUrl.pathname.startsWith("/dashboard/admin")) {
-      if (decoded.type != "admin") {
-        return NextResponse.redirect(
-          new URL("/dashboard?showErr=Unauthorised!", req.url)
-        );
-      } else {
-        return NextResponse.next();
-      }
-    }
-  }
+  // if (token?.value != null) {
+  //   const decoded: User = jwt_decode(token?.value);
+  //   if (req.nextUrl.pathname.startsWith("/dashboard/admin")) {
+  //     if (decoded.type != "admin") {
+  //       return NextResponse.redirect(
+  //         new URL("/dashboard?showErr=Unauthorised!", req.url)
+  //       );
+  //     } else {
+  //       return NextResponse.next();
+  //     }
+  //   }
+  // }
 }
 
 export const config = {

@@ -3,14 +3,15 @@ import axios from "axios";
 import { useLoginUser } from "@/hooks/Login/useLoginUser";
 import { getAllCouriers } from "@/hooks/Dashboard/getAllUsers";
 import toast from "react-hot-toast";
-import { useAuthContext } from "@/context/AuthContext";
+import { useRouter } from "next/router";
+import { useStore } from "@/store/store";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [disabled, setDisabled] = useState<boolean>(true);
-  const { loginUser } = useAuthContext();
-
+  const router = useRouter();
+  const { loginUser } = useStore((store) => store.actions);
   useEffect(() => {
     if (email != "" && password != "") {
       setDisabled(!disabled);
@@ -31,6 +32,7 @@ const Login: React.FC = () => {
     if (data.success) {
       toast.success("Successfully logged in!");
       loginUser();
+      // router.push("/dashboard/admin");
     }
     if (data.error) {
       toast.error(data.error);
@@ -39,6 +41,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     getAllCouriers();
   }, []);
+
   return (
     <div className="w-full h-screen bg-gradient-to-r from-rose-100 to-teal-100 flex justify-center items-center">
       <div className="w-full h-full flex justify-center items-center ">
